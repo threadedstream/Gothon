@@ -38,3 +38,16 @@ func TestRetrieveStatisticsFromDatabase(t *testing.T) {
 	assert.Equal(t, err, nil)
 	assert.NotEqual(t, rows, nil)
 }
+
+func TestDeleteAllStatisticsFromDatabase(t *testing.T) {
+	user := os.Getenv("POSTGRES_USER")
+	password := os.Getenv("POSTGRES_PASSWORD")
+	dbname := os.Getenv("POSTGRES_DB")
+
+	a := App{}
+
+	a.initialize(user, password, dbname, "")
+
+	err := a.deleteAllStatisticsFromDatabase()
+	assert.Equal(t, err, nil)
+}

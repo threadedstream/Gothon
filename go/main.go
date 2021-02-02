@@ -21,13 +21,15 @@ type Statistics struct {
 	Date   time.Time `json:"date"`
 	Views  int       `json:"views"`
 	Clicks int       `json:"clicks"`
-	Cost   int       `json:"cost"`
+	Cost   float32   `json:"cost"`
 	Cpc    float32   `json:"cpc"`
 	Cpm    float32   `json:"cpm"`
 }
 
 func (a *App) initRoutes() {
 	a.Router.Path("/save_stats/").HandlerFunc(a.saveStatistics).Methods("POST")
+	a.Router.Path("/retrieve_stats/").HandlerFunc(a.retrieveStatistics).Methods("GET")
+	a.Router.Path("/delete_stats/").HandlerFunc(a.deleteAllStatistics).Methods("DELETE")
 }
 
 func (a *App) initialize(user, password, dbname, addr string) {

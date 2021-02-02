@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"regexp"
 )
@@ -24,6 +25,15 @@ func (r *Response) jsonResponse() {
 	r.w.Write(response)
 }
 
+func responseShortcut(w http.ResponseWriter, statusCode int, responseMessage interface{}) {
+	response := Response{
+		w:               w,
+		statusCode:      statusCode,
+		responseMessage: responseMessage,
+	}
+	response.jsonResponse()
+}
+
 func (a *App) saveStatistics(w http.ResponseWriter, r *http.Request) {
 	date := r.PostFormValue("date")
 	views := r.PostFormValue("views")
@@ -32,46 +42,28 @@ func (a *App) saveStatistics(w http.ResponseWriter, r *http.Request) {
 	var err error
 	var matches bool
 	if date == "" {
-		response := Response{
-			w:               w,
-			statusCode:      http.StatusBadRequest,
-			responseMessage: map[string]interface{}{"status": false, "result": "Date is the mandatory field"},
-		}
-		response.jsonResponse()
+		responseShortcut(w, http.StatusBadRequest,
+			map[string]interface{}{"status": false, "result": "Date is the mandatory field"})
 		return
 	}
-
 	matches, err = regexp.MatchString(yyyyMMDDRegex, date)
 	if err != nil {
 		panic(err)
 	}
 	if !matches {
-		response := Response{
-			w:               w,
-			statusCode:      http.StatusBadRequest,
-			responseMessage: map[string]interface{}{"status": false, "result": "The format of date should be 'YYYY-mm-dd'"},
-		}
-		response.jsonResponse()
+		responseShortcut(w, http.StatusBadRequest,
+			map[string]interface{}{"status": false, "result": "The format of date should be 'YYYY-mm-dd'"})
 		return
 	}
 
 	err = a.saveStatisticsToDatabase(date, views, clicks, cost)
 	if err != nil {
-		response := Response{
-			w:               w,
-			statusCode:      http.StatusBadRequest,
-			responseMessage: map[string]interface{}{"status": false, "result": "Failed to save statistics"},
-		}
-		response.jsonResponse()
+		responseShortcut(w, http.StatusBadRequest,
+			map[string]interface{}{"status": false, "result": "Failed to save statistics"})
 		return
 	}
 
-	response := Response{
-		w:               w,
-		statusCode:      http.StatusOK,
-		responseMessage: map[string]interface{}{"status": true, "result": "OK"},
-	}
-	response.jsonResponse()
+	responseShortcut(w, http.StatusOK, map[string]interface{}{"status": true, "result": "OK"})
 }
 
 func (a *App) retrieveStatistics(w http.ResponseWriter, r *http.Request) {
@@ -80,14 +72,11 @@ func (a *App) retrieveStatistics(w http.ResponseWriter, r *http.Request) {
 	var err error
 	var matchesFrom bool
 	var matchesTo bool
+	var statsList []Statistics
 
 	if from == "" || to == "" {
-		response := Response{
-			w:               w,
-			statusCode:      http.StatusBadRequest,
-			responseMessage: map[string]interface{}{"status": false, "result": "Please, fill out all necessary fields"},
-		}
-		response.jsonResponse()
+		responseShortcut(w, http.StatusBadRequest,
+			map[string]interface{}{"status": false, "result": "Please, fill out all necessary fields"})
 		return
 	}
 	matchesFrom, err = regexp.MatchString(yyyyMMDDRegex, from)
@@ -99,12 +88,36 @@ func (a *App) retrieveStatistics(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	if !(matchesFrom && matchesTo) {
-		response := Response{
-			w:               w,
-			statusCode:      http.StatusBadRequest,
-			responseMessage: map[string]interface{}{"status": false, "result": "The format of date should be 'YYYY-mm-dd'"},
-		}
-		response.jsonResponse()
+		responseShortcut(w, http.StatusBadRequest,
+			map[string]interface{}{"status": false, "result": "The format of date should be 'YYYY-mm-dd'"})
 		return
+	}
+
+	data, err := a.retrieveStatisticsFromDatabase(from, to)
+	if err != nil {
+		responseShortcut(w, http.StatusBadRequest, map[string]interface{}{"status": false, "result": "Failed to load statistics"})
+		return
+	}
+	for i := range data {
+		var stats Statistics
+		b, err := json.Marshal(data[i])
+		if err != nil {
+			log.Fatal(err)
+		}
+		err_ := json.Unmarshal(b, &stats)
+		if err_ != nil {
+			log.Fatal(err_)
+		}
+		statsList = append(statsList, stats)
+	}
+
+	responseShortcut(w, http.StatusOK, map[string]interface{}{"status": true, "result": statsList})
+}
+
+func (a *App) deleteAllStatistics(w http.ResponseWriter, r *http.Request) {
+	err := a.deleteAllStatisticsFromDatabase()
+	if err != nil {
+		responseShortcut(w, http.StatusBadRequest,
+			map[string]interface{}{"success": false, "result": "Failed to delete statistics from database"})
 	}
 }

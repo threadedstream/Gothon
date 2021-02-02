@@ -11,7 +11,7 @@ func (a *App) saveStatisticsToDatabase(date, views, clicks, cost string) error {
 	// To avoid further division by zero
 	var viewsInt int = 1
 	var clicksInt int = 1
-	var costInt int = 1
+	var costFloat float32 = 1.0
 	var err error
 	if views != "" {
 		viewsInt, err = strconv.Atoi(views)
@@ -28,13 +28,13 @@ func (a *App) saveStatisticsToDatabase(date, views, clicks, cost string) error {
 	}
 
 	if cost != "" {
-		costInt, err = strconv.Atoi(cost)
+		costFloat, err = costToFloat32(cost)
 		if err != nil {
 			return err
 		}
 	}
 
-	query := fmt.Sprintf("INSERT INTO statistics (date, views, clicks, cost) VALUES ('%s', %d, %d, %d)", date, viewsInt, clicksInt, costInt)
+	query := fmt.Sprintf("INSERT INTO statistics (date, views, clicks, cost) VALUES ('%s', %d, %d, %f)", date, viewsInt, clicksInt, costFloat)
 	_, err = a.Conn.Query(query)
 	if err != nil {
 		return err
@@ -51,7 +51,16 @@ func (a *App) retrieveStatisticsFromDatabase(from, to string) ([]map[string]inte
 	}
 
 	m := mapify(rows)
+
 	return m, err
+}
+
+func (a *App) deleteAllStatisticsFromDatabase() error {
+	_, err := a.Conn.Query("DELETE FROM statistics")
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func mapify(rows *sql.Rows) []map[string]interface{} {
@@ -59,7 +68,7 @@ func mapify(rows *sql.Rows) []map[string]interface{} {
 	var date time.Time
 	var views int
 	var clicks int
-	var cost int
+	var cost float32
 	var cpc float32
 	var cpm float32
 	for rows.Next() {
@@ -68,13 +77,13 @@ func mapify(rows *sql.Rows) []map[string]interface{} {
 			fmt.Println(err)
 		}
 		if clicks != 0 {
-			cpc = float32(cost / clicks)
+			cpc = cost / float32(clicks)
 		} else {
 			cpc = 0
 		}
 
 		if views != 0 {
-			cpm = (float32(cost / views)) * 1000
+			cpm = (cost / float32(views)) * 1000
 		} else {
 			cpm = 0
 		}
