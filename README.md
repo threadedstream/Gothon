@@ -109,3 +109,12 @@ As you might have already noticed, this request does not require any parameters.
 # A bit of plans
 
 This project was conceived with dual language implementation in mind. So, python version's coming soon ;)
+
+# Update
+
+Just finished python version of this project. Be sure to run initial migrations beforehand: 
+
+```bash
+	sudo docker-compose run web python3 manage.py makemigrations
+	sudo docker-compose run web python3 manage.py migrate
+```
