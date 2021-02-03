@@ -1,6 +1,6 @@
 # Gothon
 
-So, this project is written using two languages -- python and golang. Golang part of the project is already finished.
+So, this project is written using two languages -- python and golang(python version may be missing). Golang part of the project is already finished.
 
 #How to run golang part?
 
