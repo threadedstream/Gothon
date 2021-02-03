@@ -26,7 +26,7 @@ SECRET_KEY = 'utf*)0rx9lj4bgh3birrqc1o8e(1io8)%-te!_7(-e8!qa$6w9'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -83,7 +83,7 @@ DATABASES = {
         'NAME': os.getenv('POSTGRES_DB'),
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': '127.0.0.1',
+        'HOST': os.getenv('POSTGRES_HOST'),
         'PORT': '5432'
     }
 }

@@ -1,14 +1,16 @@
-version: "3.9"
+version: "3.7"
 
 services:
   db:
     image: postgres
-    environment:
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    env_file:
+      - "vars.env"
+    ports:
+      - "5433:5433"
   web:
     build: .
+    env_file:
+      - "vars.env"
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/src
