@@ -42,6 +42,7 @@ func (a *App) saveStatistics(w http.ResponseWriter, r *http.Request) {
 	var err error
 	var matches bool
 	if date == "" {
+		log.Println(err)
 		responseShortcut(w, http.StatusBadRequest,
 			map[string]interface{}{"status": false, "result": "Date is the mandatory field"})
 		return
@@ -51,6 +52,7 @@ func (a *App) saveStatistics(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	if !matches {
+		log.Println(err)
 		responseShortcut(w, http.StatusBadRequest,
 			map[string]interface{}{"status": false, "result": "The format of date should be 'YYYY-mm-dd'"})
 		return
@@ -58,6 +60,7 @@ func (a *App) saveStatistics(w http.ResponseWriter, r *http.Request) {
 
 	err = a.saveStatisticsToDatabase(date, views, clicks, cost)
 	if err != nil {
+		log.Println(err)
 		responseShortcut(w, http.StatusBadRequest,
 			map[string]interface{}{"status": false, "result": "Failed to save statistics"})
 		return
@@ -67,8 +70,12 @@ func (a *App) saveStatistics(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) retrieveStatistics(w http.ResponseWriter, r *http.Request) {
-	from := r.FormValue("from")
-	to := r.FormValue("to")
+	var orderBy string
+	params := r.URL.Query()
+	from := params["from"][0]
+	to := params["to"][0]
+	orderBy = params["order_by"][0]
+
 	var err error
 	var matchesFrom bool
 	var matchesTo bool
@@ -78,6 +85,11 @@ func (a *App) retrieveStatistics(w http.ResponseWriter, r *http.Request) {
 		responseShortcut(w, http.StatusBadRequest,
 			map[string]interface{}{"status": false, "result": "Please, fill out all necessary fields"})
 		return
+	}
+
+	if orderBy != "date" && orderBy != "views" && orderBy != "clicks" && orderBy != "cost" {
+		//Default ordering option
+		orderBy = "date"
 	}
 	matchesFrom, err = regexp.MatchString(yyyyMMDDRegex, from)
 	if err != nil {
@@ -93,11 +105,12 @@ func (a *App) retrieveStatistics(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, err := a.retrieveStatisticsFromDatabase(from, to)
+	data, err := a.retrieveStatisticsFromDatabase(from, to, orderBy)
 	if err != nil {
 		responseShortcut(w, http.StatusBadRequest, map[string]interface{}{"status": false, "result": "Failed to load statistics"})
 		return
 	}
+
 	for i := range data {
 		var stats Statistics
 		b, err := json.Marshal(data[i])
@@ -110,8 +123,14 @@ func (a *App) retrieveStatistics(w http.ResponseWriter, r *http.Request) {
 		}
 		statsList = append(statsList, stats)
 	}
-
-	responseShortcut(w, http.StatusOK, map[string]interface{}{"status": true, "result": statsList})
+	//A bit of duality)
+	var output interface{}
+	if len(statsList) == 0 {
+		output = "[]"
+	} else {
+		output = statsList
+	}
+	responseShortcut(w, http.StatusOK, map[string]interface{}{"status": true, "result": output})
 }
 
 func (a *App) deleteAllStatistics(w http.ResponseWriter, r *http.Request) {
@@ -119,5 +138,9 @@ func (a *App) deleteAllStatistics(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		responseShortcut(w, http.StatusBadRequest,
 			map[string]interface{}{"success": false, "result": "Failed to delete statistics from database"})
+		return
 	}
+
+	responseShortcut(w, http.StatusOK,
+		map[string]interface{}{"success": false, "result": "OK"})
 }

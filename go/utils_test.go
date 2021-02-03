@@ -26,12 +26,15 @@ func TestFloat32ToCost(t *testing.T) {
 	sample0 := float32(34.21)
 	sample1 := float32(3.14159265359)
 	sample2 := float32(52.12)
+	sample3 := float32(4560)
 
 	output0 := float32ToCost(sample0)
 	output1 := float32ToCost(sample1)
 	output2 := float32ToCost(sample2)
+	output3 := float32ToCost(sample3)
 
 	assert.Equal(t, output0, "34r 21k")
 	assert.Equal(t, output1, "3r 14k")
 	assert.Equal(t, output2, "52r 12k")
+	assert.Equal(t, output3, "4560r 00k")
 }

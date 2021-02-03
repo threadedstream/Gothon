@@ -43,8 +43,8 @@ func (a *App) saveStatisticsToDatabase(date, views, clicks, cost string) error {
 	return nil
 }
 
-func (a *App) retrieveStatisticsFromDatabase(from, to string) ([]map[string]interface{}, error) {
-	query := fmt.Sprintf("SELECT date, views, clicks, cost FROM statistics WHERE date >= '%s' AND date <= '%s' ORDER BY date", from, to)
+func (a *App) retrieveStatisticsFromDatabase(from, to, orderBy string) ([]map[string]interface{}, error) {
+	query := fmt.Sprintf("SELECT date, views, clicks, cost FROM statistics WHERE date >= '%s' AND date <= '%s' ORDER BY %s", from, to, orderBy)
 	rows, err := a.Conn.Query(query)
 	if err != nil {
 		return nil, err
@@ -88,7 +88,12 @@ func mapify(rows *sql.Rows) []map[string]interface{} {
 			cpm = 0
 		}
 
-		elem := map[string]interface{}{"Date": date, "Views": views, "Clicks": clicks, "Cost": cost, "Cpc": cpc, "Cpm": cpm}
+		elem := map[string]interface{}{"Date": date,
+			"Views":  views,
+			"Clicks": clicks,
+			"Cost":   float32ToCost(cost),
+			"Cpc":    float32ToCost(cpc),
+			"Cpm":    float32ToCost(cpm)}
 		mapping = append(mapping, elem)
 	}
 	return mapping

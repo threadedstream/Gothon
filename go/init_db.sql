@@ -3,6 +3,6 @@ CREATE TABLE IF NOT EXISTS statistics(
     date DATE NOT NULL DEFAULT CURRENT_DATE,
     views INT,
     clicks INT,
-    cost   FLOAT,
+    cost   FLOAT
 );
 

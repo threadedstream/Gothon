@@ -33,6 +33,10 @@ func float32ToCost(sum float32) string {
 	sumStr := fmt.Sprintf("%.2f", sum)
 	split := strings.Split(sumStr, ".")
 	rubs = split[0] + "r"
-	kops = split[1] + "k"
+	if len(split) > 1 {
+		kops = split[1] + "k"
+	} else {
+		kops = "0k"
+	}
 	return rubs + " " + kops
 }

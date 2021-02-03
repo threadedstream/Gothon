@@ -21,9 +21,9 @@ type Statistics struct {
 	Date   time.Time `json:"date"`
 	Views  int       `json:"views"`
 	Clicks int       `json:"clicks"`
-	Cost   float32   `json:"cost"`
-	Cpc    float32   `json:"cpc"`
-	Cpm    float32   `json:"cpm"`
+	Cost   string    `json:"cost"`
+	Cpc    string    `json:"cpc"`
+	Cpm    string    `json:"cpm"`
 }
 
 func (a *App) initRoutes() {

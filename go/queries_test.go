@@ -33,8 +33,9 @@ func TestRetrieveStatisticsFromDatabase(t *testing.T) {
 
 	from := "2077-12-25"
 	to := "2078-01-05"
+	orderBy := "views"
 
-	rows, err := a.retrieveStatisticsFromDatabase(from, to)
+	rows, err := a.retrieveStatisticsFromDatabase(from, to, orderBy)
 	assert.Equal(t, err, nil)
 	assert.NotEqual(t, rows, nil)
 }
