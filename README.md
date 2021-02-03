@@ -109,3 +109,7 @@ As you might have already noticed, this request does not require any parameters.
 # A bit of plans
 
 This project was conceived with dual language implementation in mind. So, python version's coming soon ;)
+
+# Update
+
+Just finished python version of this project. 
