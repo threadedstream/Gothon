@@ -2,7 +2,7 @@
 
 So, this project is written using two languages -- python and golang(python version may be missing). Golang part of the project is already finished.
 
-#How to run golang part?
+# How to run golang part?
 
 First, you need to edit vars.env file. Here is a small template
 
@@ -45,7 +45,13 @@ Here are few examples of making requests to the server using http.Client structu
 ```
 As you can see, request accepts 4 parameters -- date, views, clicks, and cost, with 3 of them being optional, namely views, clicks, and cost.
 First, server checks against presence of mandatory date field and immediately spits out bad response in case if condition takes place. 
-Afterwards, it's analysing format structure of input date. If the latter does not conform to 'YYYY-mm-dd', server responds with "BadRequest" message.
+Afterwards, it's analysing format structure of input date. If the latter does not conform to 'YYYY-mm-dd', server responds with "BadRequest" message. 
+Take a look at the cost BNF format
+```
+  expr := <num + "r" num + "k">
+  num := int
+  int := "[1-9]+"
+```
 Here is code for makePostMultipartRequest function:
 ```go
   func makePostMultipartRequest(client *http.Client, url string, params map[string]string) (err error, res *http.Response) {
@@ -100,6 +106,6 @@ Lastly, I need to demostrate an example of deleting all statistics from database
 ```
 As you might have already noticed, this request does not require any parameters.
 
-#A bit of plans
+# A bit of plans
 
 This project was conceived with dual language implementation in mind. So, python version's coming soon ;)
