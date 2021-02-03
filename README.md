@@ -112,4 +112,9 @@ This project was conceived with dual language implementation in mind. So, python
 
 # Update
 
-Just finished python version of this project. 
+Just finished python version of this project. Be sure to run initial migrations beforehand: 
+
+```bash
+	sudo docker-compose run web python3 manage.py makemigrations
+	sudo docker-compose run web python3 manage.py migrate
+```
