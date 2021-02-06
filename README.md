@@ -10,6 +10,8 @@ First, you need to edit vars.env file. Here is a small template
   POSTGRES_USER=<postgres_user>
   POSTGRES_PASSWORD=<postgres_pass>
   POSTGRES_DB=<postgres_db>
+  POSTGRES_HOST=<postgres_host>
+  POSTGRES_PORT=<postgres_port>
   ADDR=0.0.0.0:<desired_port>
 ```
 

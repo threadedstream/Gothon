@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -32,8 +33,8 @@ func (a *App) initRoutes() {
 	a.Router.Path("/delete_stats/").HandlerFunc(a.deleteAllStatistics).Methods("DELETE")
 }
 
-func (a *App) initialize(user, password, dbname, addr string) {
-	connString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", "192.168.1.40", 5432, user, password, dbname)
+func (a *App) initialize(user, password, dbname, addr, host string, port int) {
+	connString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 
 	var err error
 	a.Conn, err = sql.Open("postgres", connString)
@@ -62,10 +63,16 @@ func main() {
 	user := os.Getenv("POSTGRES_USER")
 	password := os.Getenv("POSTGRES_PASSWORD")
 	dbname := os.Getenv("POSTGRES_DB")
+	host := os.Getenv("POSTGRES_HOST")
+	port, err := strconv.Atoi(os.Getenv("POSTGRES_PORT"))
+	if err != nil {
+		panic(err)
+	}
 	addr := os.Getenv("ADDR")
+
 	a := App{}
 
-	a.initialize(user, password, dbname, addr)
+	a.initialize(user, password, dbname, addr, host, port)
 	a.initRoutes()
 	//a.checkSellerOfferExistence(1,1)
 	log.Println("Welcome, dear inhabitant of Avito world!")
