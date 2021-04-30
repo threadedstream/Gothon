@@ -26,7 +26,7 @@ Don't worry if an error unexpectedly appears out of nowhere -- that way the term
 In a word, that particular command tells docker to log into the psql environment and immediately execute contents of init_db.sql, which happens to be 
 a postgresql query to initialize new table. 
 
-#Architecture
+# Architecture
 
 Api has only 3 requests, namely saveStatistics, retrieveStatistics, and deleteAllStatistics. 
 Here are few examples of making requests to the server using http.Client structure.
