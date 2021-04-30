@@ -17,7 +17,7 @@ First, you need to edit vars.env file. Here is a small template
 
 Second, you need to run docker-compose up. Is that it? Patience, there's one thing left to do. 
 
-#Running query to create table in database
+# Running query to create table in database
 By the way, you also need to create database and name it gothon beforehand. The next command to run will be the following:
 ```bash
   sudo docker container exec <container_id> export PGPASSWORD=<postgres_password"; psql -h <your_lan_ip> -U postgres -W gothon -c "$(cat init_db.sql)"
